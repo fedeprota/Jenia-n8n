@@ -1,0 +1,55 @@
+{
+  "name": "Claude Test Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e7f6f7b1-e7a2-4a1a-b6e1-9d8a3a9a1a1a",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        250
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a8b7c6d5-e4f3-2109-8765-43210fedcba9",
+              "name": "message",
+              "value": "Hello from Claude Code! 🚀",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f8e7d6c5-b4a3-2109-8765-43210fedcba9",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        470,
+        250
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
