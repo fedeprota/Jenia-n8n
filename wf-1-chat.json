@@ -1,0 +1,35 @@
+{
+  "name": "1. Jenia - Chat Agent",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "chat-agent", "responseMode": "lastNode", "options": {} },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": { 
+        "promptType": "define", 
+        "text": "={{ $json.body.message }}", 
+        "options": { "systemMessage": "Sei Jenia, l'assistente per la ricerca di brevetti." } 
+      },
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [250, 0]
+    },
+    {
+      "parameters": { "model": "gpt-4o" },
+      "name": "OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [250, 200]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "AI Agent", "type": "main", "index": 0 }]] },
+    "OpenAI Model": { "ai_languageModel": [[{ "node": "AI Agent", "type": "ai_languageModel", "index": 0 }]] }
+  },
+  "settings": {}
+}

@@ -1,0 +1,43 @@
+{
+  "name": "2. Jenia - Similarity Score",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "similarity-score", "responseMode": "lastNode", "options": {} },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": { 
+        "promptType": "define", 
+        "text": "Analizza il testo: {{ $json.body.text }} e restituisci un JSON con lo score di similarità e il litigation risk.", 
+        "options": { "systemMessage": "Sei un analista brevettuale. Ritorna ESATTAMENTE e SOLO sintassi JSON." } 
+      },
+      "name": "LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1,
+      "position": [250, 0]
+    },
+    {
+      "parameters": { "model": "gpt-4o" },
+      "name": "OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [250, 200]
+    },
+    {
+      "parameters": { "options": {} },
+      "name": "Parse JSON",
+      "type": "n8n-nodes-base.jsonParse",
+      "typeVersion": 1,
+      "position": [500, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "LLM Chain", "type": "main", "index": 0 }]] },
+    "OpenAI Model": { "ai_languageModel": [[{ "node": "LLM Chain", "type": "ai_languageModel", "index": 0 }]] },
+    "LLM Chain": { "main": [[{ "node": "Parse JSON", "type": "main", "index": 0 }]] }
+  },
+  "settings": {}
+}

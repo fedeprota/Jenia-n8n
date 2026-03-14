@@ -1,0 +1,59 @@
+{
+  "name": "4. Jenia - Alert Data Fetch",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "GET", "path": "alert-data", "responseMode": "lastNode", "options": {} },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": { 
+        "url": "https://psxttovzzwfamdwwjndx.supabase.co/rest/v1/patents?select=*", 
+        "method": "GET", 
+        "sendHeaders": true, 
+        "headerParameters": { 
+          "parameters": [
+            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeHR0b3Z6endmYW1kd3dqbmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODUyOTksImV4cCI6MjA4OTA2MTI5OX0.3MIB5wJf7Liavtb5jsaGtfivehu0rnJNkO1tH5YfUf4" }, 
+            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeHR0b3Z6endmYW1kd3dqbmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODUyOTksImV4cCI6MjA4OTA2MTI5OX0.3MIB5wJf7Liavtb5jsaGtfivehu0rnJNkO1tH5YfUf4" }
+          ] 
+        } 
+      },
+      "name": "Fetch Patents",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [200, 0]
+    },
+    {
+      "parameters": { 
+        "url": "https://psxttovzzwfamdwwjndx.supabase.co/rest/v1/competitors?select=*", 
+        "method": "GET", 
+        "sendHeaders": true, 
+        "headerParameters": { 
+          "parameters": [
+            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeHR0b3Z6endmYW1kd3dqbmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODUyOTksImV4cCI6MjA4OTA2MTI5OX0.3MIB5wJf7Liavtb5jsaGtfivehu0rnJNkO1tH5YfUf4" }, 
+            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeHR0b3Z6endmYW1kd3dqbmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODUyOTksImV4cCI6MjA4OTA2MTI5OX0.3MIB5wJf7Liavtb5jsaGtfivehu0rnJNkO1tH5YfUf4" }
+          ] 
+        } 
+      },
+      "name": "Fetch Competitors",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [200, 200]
+    },
+    {
+      "parameters": { "jsCode": "return { json: { patents: $items(\"Fetch Patents\").map(i => i.json), competitors: $items(\"Fetch Competitors\").map(i => i.json) } }" },
+      "name": "Merge Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 100]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Fetch Patents", "type": "main", "index": 0 }, { "node": "Fetch Competitors", "type": "main", "index": 0 }]] },
+    "Fetch Patents": { "main": [[{ "node": "Merge Data", "type": "main", "index": 0 }]] },
+    "Fetch Competitors": { "main": [[{ "node": "Merge Data", "type": "main", "index": 0 }]] }
+  },
+  "settings": {}
+}
