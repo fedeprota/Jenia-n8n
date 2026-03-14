@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Folder,
@@ -40,19 +40,30 @@ const getFileIcon = (item: FileItem) => {
   return <File size={20} className="text-text-tertiary" />;
 };
 
-// Fallback mock data if API fails
-const fallbackFiles: FileItem[] = [
+// Mock file data
+const mockFiles: FileItem[] = [
   { id: '1', name: 'Research Documents', type: 'folder', modified: '2026-03-10' },
   { id: '2', name: 'Patent Analysis', type: 'folder', modified: '2026-03-08' },
   { id: '3', name: 'Competitor Reports', type: 'folder', modified: '2026-03-05' },
   { id: '4', name: 'patent_data_2026.csv', type: 'file', mimeType: 'text/csv', size: '2.4 MB', modified: '2026-03-10' },
+  { id: '5', name: 'Neural_Network_v3.pdf', type: 'file', mimeType: 'application/pdf', size: '5.1 MB', modified: '2026-03-09' },
+  { id: '6', name: 'market_analysis.csv', type: 'file', mimeType: 'text/csv', size: '1.8 MB', modified: '2026-03-07' },
+  { id: '7', name: 'edge_computing_report.pdf', type: 'file', mimeType: 'application/pdf', size: '3.2 MB', modified: '2026-03-06' },
+  { id: '8', name: 'competitor_data.csv', type: 'file', mimeType: 'text/csv', size: '890 KB', modified: '2026-03-04' },
 ];
 
+// Mock CSV data
 const mockCSVData = {
   headers: ['Patent ID', 'Title', 'Company', 'Filing Date', 'Status', 'Risk Score'],
   rows: [
     ['US-2026-001', 'Neural Network Optimization', 'TechCorp', '2026-01-15', 'Active', '85%'],
     ['US-2026-002', 'Edge Processing Method', 'Innovation Labs', '2026-01-22', 'Pending', '62%'],
+    ['US-2026-003', 'Quantum Encryption', 'Global Research', '2026-02-01', 'Active', '34%'],
+    ['US-2026-004', 'Adaptive ML System', 'FutureTech', '2026-02-10', 'Review', '71%'],
+    ['US-2026-005', 'IoT Communication', 'Advanced Sys', '2026-02-18', 'Active', '45%'],
+    ['US-2026-006', 'Data Compression', 'TechCorp', '2026-03-01', 'Pending', '58%'],
+    ['US-2026-007', 'Autonomous Navigation', 'Innovation Labs', '2026-03-05', 'Active', '77%'],
+    ['US-2026-008', 'Bio-sensor Array', 'Global Research', '2026-03-08', 'Review', '29%'],
   ],
 };
 
@@ -62,46 +73,6 @@ export default function DatabasePage() {
   const [openCSV, setOpenCSV] = useState<string | null>(null);
   const [csvData, setCSVData] = useState(mockCSVData);
   const [isAICleaning, setIsAICleaning] = useState(false);
-  
-  const [files, setFiles] = useState<FileItem[]>([]);
-  const [isLoadingFiles, setIsLoadingFiles] = useState(true);
-
-  // Fetch file list from n8n Google Drive webhook
-  useEffect(() => {
-    async function fetchFiles() {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL}/drive`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'list' }),
-        });
-        
-        if (!res.ok) throw new Error('API Error');
-        const data = await res.json();
-        
-        // n8n GDrive node returns array of files
-        const fileList = Array.isArray(data) ? data : data.files || [];
-        if (fileList.length > 0) {
-          setFiles(fileList.map((f: any) => ({
-            id: f.id,
-            name: f.name,
-            type: f.mimeType === 'application/vnd.google-apps.folder' ? 'folder' : 'file',
-            mimeType: f.mimeType,
-            modified: f.modifiedTime ? new Date(f.modifiedTime).toLocaleDateString() : 'Unknown'
-          })));
-        } else {
-          setFiles(fallbackFiles);
-        }
-      } catch (err) {
-        console.error('Error fetching drive files', err);
-        setFiles(fallbackFiles);
-      } finally {
-        setIsLoadingFiles(false);
-      }
-    }
-    
-    fetchFiles();
-  }, []);
 
   const handleFileClick = (item: FileItem) => {
     if (item.type === 'folder') {
@@ -113,38 +84,16 @@ export default function DatabasePage() {
 
   const handleAIClean = async () => {
     setIsAICleaning(true);
-    try {
-      // Send current raw CSV state to n8n webhook for processing
-      const res = await fetch(`${process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL}/csv-clean`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: openCSV, data: csvData }),
-      });
-      
-      if (!res.ok) throw new Error('AI Clean failed');
-      const data = await res.json();
-      
-      // Assume webhook parses the CSV and returns structured output
-      if (data && data.headers && data.rows) {
-        setCSVData(data);
-      } else if (data.output) {
-         // Se il nodo LLM restituisce una stringa json-encoded
-         const parsed = typeof data.output === 'string' ? JSON.parse(data.output) : data.output;
-         if (parsed.headers && parsed.rows) setCSVData(parsed);
-      }
-    } catch (err) {
-      console.error('Error during AI clean:', err);
-      // Fallback simulaton if webhook isn't fully ready
-      await new Promise((r) => setTimeout(r, 1500));
-      setCSVData({
-        ...csvData,
-        rows: csvData.rows.map((row) =>
-          row.map((cell) => (cell === 'Pending' ? 'In Review' : cell))
-        ),
-      });
-    } finally {
-      setIsAICleaning(false);
-    }
+    // Simulate AI cleaning
+    await new Promise((r) => setTimeout(r, 2000));
+    // In production: send to n8n webhook
+    setCSVData({
+      ...csvData,
+      rows: csvData.rows.map((row) =>
+        row.map((cell) => (cell === 'Pending' ? 'In Review' : cell))
+      ),
+    });
+    setIsAICleaning(false);
   };
 
   const handleBackToFiles = () => {
@@ -313,51 +262,43 @@ export default function DatabasePage() {
               : 'flex flex-col gap-1'
           )}
         >
-          {isLoadingFiles ? (
-            <div className="col-span-full py-12 flex items-center justify-center">
-              <div className="w-8 h-8 rounded-xl gradient-hero flex items-center justify-center">
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              </div>
-            </div>
-          ) : (
-            files.map((file, i) => (
-              <motion.div
-                key={file.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-              >
-                {viewMode === 'grid' ? (
-                  <button
-                    onClick={() => handleFileClick(file)}
-                    className="w-full p-4 bg-surface border border-border rounded-2xl hover:shadow-md hover:border-border-strong transition-all duration-200 text-left cursor-pointer group"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-surface-secondary flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                      {getFileIcon(file)}
-                    </div>
-                    <p className="text-[13px] font-medium text-text-primary truncate">
-                      {file.name}
-                    </p>
-                    <p className="text-[11px] text-text-tertiary mt-1">
-                      {file.size || 'Folder'} · {file.modified}
-                    </p>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleFileClick(file)}
-                    className="w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-surface-secondary transition-colors text-left cursor-pointer"
-                  >
+          {mockFiles.map((file, i) => (
+            <motion.div
+              key={file.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04 }}
+            >
+              {viewMode === 'grid' ? (
+                <button
+                  onClick={() => handleFileClick(file)}
+                  className="w-full p-4 bg-surface border border-border rounded-2xl hover:shadow-md hover:border-border-strong transition-all duration-200 text-left cursor-pointer group"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-surface-secondary flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
                     {getFileIcon(file)}
-                    <span className="flex-1 text-[14px] font-medium text-text-primary truncate">
-                      {file.name}
-                    </span>
-                    <span className="text-[12px] text-text-tertiary">{file.size || '—'}</span>
-                    <span className="text-[12px] text-text-tertiary">{file.modified}</span>
-                  </button>
-                )}
-              </motion.div>
-            ))
-          )}
+                  </div>
+                  <p className="text-[13px] font-medium text-text-primary truncate">
+                    {file.name}
+                  </p>
+                  <p className="text-[11px] text-text-tertiary mt-1">
+                    {file.size || 'Folder'} · {file.modified}
+                  </p>
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleFileClick(file)}
+                  className="w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-surface-secondary transition-colors text-left cursor-pointer"
+                >
+                  {getFileIcon(file)}
+                  <span className="flex-1 text-[14px] font-medium text-text-primary truncate">
+                    {file.name}
+                  </span>
+                  <span className="text-[12px] text-text-tertiary">{file.size || '—'}</span>
+                  <span className="text-[12px] text-text-tertiary">{file.modified}</span>
+                </button>
+              )}
+            </motion.div>
+          ))}
         </motion.div>
       )}
     </div>

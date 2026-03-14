@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CompetitorTracking } from '@/components/alert/CompetitorTracking';
 import { KeywordsList } from '@/components/alert/KeywordsList';
 import { PatentTimeline } from '@/components/alert/PatentTimeline';
 import type { Competitor, Keyword, Patent } from '@/types/alert';
 
-// Mock data for sidebars
+// Mock data
 const initialCompetitors: Competitor[] = [
   { id: '1', name: 'TechCorp Industries', patentCount: 127, trend: 'up' },
   { id: '2', name: 'Innovation Labs', patentCount: 89, trend: 'up' },
@@ -28,43 +28,52 @@ const initialKeywords: Keyword[] = [
   { id: '9', keyword: 'Blockchain' },
 ];
 
+const initialPatents: Patent[] = [
+  {
+    id: '1',
+    title: 'Advanced Neural Network Architecture for Real-Time Processing',
+    company: 'TechCorp Industries',
+    date: '2026-03-10',
+    summary:
+      'This patent presents a novel approach to neural network optimization. THREAT: Direct overlap with our current R&D project on edge computing AI. SIMILARITY: 78% overlap in claims 3-7 regarding inference optimization.',
+    riskLevel: 'HIGH',
+    similarityPct: 78,
+  },
+  {
+    id: '2',
+    title: 'Distributed Computing System with Autonomous Load Balancing',
+    company: 'Innovation Labs',
+    date: '2026-03-08',
+    summary:
+      'A method for dynamic resource allocation across distributed systems. OPPORTUNITY: White space identified in patent claims – no coverage for hybrid cloud scenarios. SIMILARITY: 45% overlap in architectural patterns.',
+    riskLevel: 'MEDIUM',
+    similarityPct: 45,
+  },
+  {
+    id: '3',
+    title: 'Quantum-Resistant Encryption Protocol for IoT Devices',
+    company: 'Global Research Inc',
+    date: '2026-03-05',
+    summary:
+      'Novel encryption method designed for resource-constrained devices. LOW RISK: Focuses on different technical domain. SIMILARITY: 12% overlap, primarily in background descriptions.',
+    riskLevel: 'LOW',
+    similarityPct: 12,
+  },
+  {
+    id: '4',
+    title: 'Adaptive Learning System for Predictive Maintenance',
+    company: 'TechCorp Industries',
+    date: '2026-03-01',
+    summary:
+      'Machine learning system for industrial equipment monitoring. THREAT: Potential IP conflict in claims 8-12. SIMILARITY: 82% similarity in training methodology and data preprocessing steps.',
+    riskLevel: 'HIGH',
+    similarityPct: 82,
+  },
+];
+
 export default function AlertPage() {
   const [competitors, setCompetitors] = useState<Competitor[]>(initialCompetitors);
   const [keywords, setKeywords] = useState<Keyword[]>(initialKeywords);
-  const [patents, setPatents] = useState<Patent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchAlertData() {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL}/alert-data`);
-        if (!res.ok) throw new Error('Failed to fetch from n8n');
-        
-        const data = await res.json();
-        // Assume webhook returns an array under data.patents or directly the array
-        const rawPatents = data.patents || (Array.isArray(data) ? data : []);
-        
-        // Ensure data matches Patent type
-        const formattedPatents: Patent[] = rawPatents.map((p: any, index: number) => ({
-          id: p.id || `n8n-${index}`,
-          title: p.title || 'Unknown Title',
-          company: p.company || 'Unknown Company',
-          date: p.date || new Date().toISOString().split('T')[0],
-          summary: p.summary || p.description || 'No summary available',
-          riskLevel: p.riskLevel || p.risk_level || 'MEDIUM',
-          similarityPct: p.similarityPct || p.similarity || Math.floor(Math.random() * 100),
-        }));
-        
-        setPatents(formattedPatents);
-      } catch (err) {
-        console.error('Error fetching patents from n8n:', err);
-        // Fallback or empty state could be handled here
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchAlertData();
-  }, []);
 
   const handleAddCompetitor = (name: string) => {
     const newCompetitor: Competitor = {
@@ -108,18 +117,7 @@ export default function AlertPage() {
       </div>
 
       {/* Patent Timeline */}
-      <div className="mt-8">
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="w-8 h-8 rounded-xl gradient-hero flex items-center justify-center">
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            </div>
-            <span className="ml-3 text-text-secondary">Loading alerts from n8n...</span>
-          </div>
-        ) : (
-          <PatentTimeline patents={patents} />
-        )}
-      </div>
+      <PatentTimeline patents={initialPatents} />
     </div>
   );
 }
