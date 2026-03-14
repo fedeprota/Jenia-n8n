@@ -1,6 +1,7 @@
 # n8n Workflow Automation con Claude Code
 
 ## Riferimenti Progetto
+
 **Progetto:** Hackaton Jenia n8n
 **URL Istanza:** https://fedemaso.app.n8n.cloud
 **Scopo:** Automation workflow sperimentali e prototipazione per hackaton
@@ -10,6 +11,7 @@
 ## Git: Commit e Push (OBBLIGATORIO)
 
 **REGOLA CRITICA:** Dopo ogni modifica a file del progetto (workflow, docs, planning, scripts), DEVI:
+
 1. `git add` dei file modificati
 2. `git commit` con messaggio descrittivo
 3. `git push origin master`
@@ -23,11 +25,13 @@ Non lasciare mai modifiche non committate o non pushate al termine di un prompt.
 **IMPORTANTE: Queste credenziali sono disponibili in ogni sessione Claude Code. NON chiedere le credenziali all'utente.**
 
 ### n8n Cloud (REST API per creare/gestire workflow)
+
 - **URL Istanza:** `https://fedemaso.app.n8n.cloud`
 - **API Key:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlZjFmNzYyNC1mMWM4LTRiN2ItYTE4OS02YTQ3OGQ0MDUyOWIiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNGM5Yzk3ZDQtNGRlYS00NGI4LWJkMzMtMzllMzg0MWFiOTYzIiwiaWF0IjoxNzczNDc5ODY5LCJleHAiOjE3NzYwMzEyMDB9.YiZW-9XW1fov3lY09gn_22WFKW8D732YbTn9_lFx-fw`
 - **Header:** `X-N8N-API-KEY: <api key sopra>`
 
 ### n8n-mcp Hosted Service (MCP per ricerca nodi/validazione)
+
 - **Configurazione:** Vedi `mcp.json` nel progetto
 
 ---
@@ -37,6 +41,7 @@ Non lasciare mai modifiche non committate o non pushate al termine di un prompt.
 Il server MCP n8n fornisce SOLO strumenti di ricerca/validazione. Per CREARE workflow direttamente sull'istanza n8n Cloud, usa la REST API via curl.
 
 ### Creare un workflow:
+
 ```bash
 curl -s -X POST "https://fedemaso.app.n8n.cloud/api/v1/workflows" \
   -H "Content-Type: application/json" \
@@ -45,18 +50,21 @@ curl -s -X POST "https://fedemaso.app.n8n.cloud/api/v1/workflows" \
 ```
 
 ### Elencare i workflow:
+
 ```bash
 curl -s "https://fedemaso.app.n8n.cloud/api/v1/workflows" \
   -H "X-N8N-API-KEY: <api key n8n cloud>"
 ```
 
 ### Ottenere un workflow specifico:
+
 ```bash
 curl -s "https://fedemaso.app.n8n.cloud/api/v1/workflows/<ID>" \
   -H "X-N8N-API-KEY: <api key n8n cloud>"
 ```
 
 ### Aggiornare un workflow:
+
 ```bash
 curl -s -X PUT "https://fedemaso.app.n8n.cloud/api/v1/workflows/<ID>" \
   -H "Content-Type: application/json" \
@@ -65,6 +73,7 @@ curl -s -X PUT "https://fedemaso.app.n8n.cloud/api/v1/workflows/<ID>" \
 ```
 
 ### Flusso di lavoro combinato:
+
 1. **MCP Server** -> cerca nodi, valida configurazioni, consulta template
 2. **REST API** -> crea/modifica/elimina workflow direttamente su n8n Cloud
 3. **Fornisci SEMPRE** il link `https://fedemaso.app.n8n.cloud/workflow/[ID]` + JSON export
@@ -76,10 +85,12 @@ curl -s -X PUT "https://fedemaso.app.n8n.cloud/api/v1/workflows/<ID>" \
 Questo progetto permette a Claude Code di costruire workflow n8n di alta qualita' in modo automatizzato. Utilizzando il server MCP n8n e le n8n skills specializzate, Claude puo' creare workflow complessi e production-ready per la tua istanza n8n Cloud.
 
 **Output Garantito per Ogni Workflow:**
+
 - **Link diretto** al workflow su n8n Cloud (apribile immediatamente nel browser)
 - **JSON export completo** del workflow (per backup e import manuale)
 
 **Stack Tecnologico:**
+
 - n8n Cloud (piattaforma di workflow automation)
 - n8n MCP Server (accesso a 1,084 nodi n8n) - solo ricerca/validazione
 - n8n Cloud REST API - per creare/gestire workflow
@@ -105,7 +116,7 @@ Questo progetto permette a Claude Code di costruire workflow n8n di alta qualita
 
 **Esempio di output corretto:**
 
-```
+````
 Ho creato il workflow richiesto!
 
 🔗 **Workflow URL:** https://fedemaso.app.n8n.cloud/workflow/ABC123XYZ
@@ -119,8 +130,9 @@ Clicca il link sopra per aprire il workflow nella tua istanza n8n Cloud.
   "connections": {...},
   "settings": {...}
 }
-```
-```
+````
+
+````
 
 ---
 
@@ -157,11 +169,12 @@ Il metodo più semplice e veloce, senza necessità di manutenzione:
        }
      }
    }
-   ```
+````
 
 5. **Riavvia Claude Code/Claude Desktop**
 
 **Vantaggi:**
+
 - Nessuna installazione locale
 - Sempre aggiornato con gli ultimi nodi n8n
 - Zero manutenzione
@@ -172,24 +185,34 @@ Il metodo più semplice e veloce, senza necessità di manutenzione:
 Per chi preferisce maggiore controllo e deployment locale:
 
 1. **Scarica l'immagine Docker:**
+
    ```bash
    docker pull ghcr.io/czlonkowski/n8n-mcp:latest
    ```
 
 2. **Configura Claude Code:**
    Aggiungi al file `claude_desktop_config.json`:
+
    ```json
    {
      "mcpServers": {
        "n8n-mcp": {
          "command": "docker",
          "args": [
-           "run", "-i", "--rm", "--init",
-           "-e", "MCP_MODE=stdio",
-           "-e", "LOG_LEVEL=error",
-           "-e", "DISABLE_CONSOLE_OUTPUT=true",
-           "-e", "N8N_API_URL=https://tuaistanza.app.n8n.cloud",
-           "-e", "N8N_API_KEY=la-tua-api-key-n8n",
+           "run",
+           "-i",
+           "--rm",
+           "--init",
+           "-e",
+           "MCP_MODE=stdio",
+           "-e",
+           "LOG_LEVEL=error",
+           "-e",
+           "DISABLE_CONSOLE_OUTPUT=true",
+           "-e",
+           "N8N_API_URL=https://tuaistanza.app.n8n.cloud",
+           "-e",
+           "N8N_API_KEY=la-tua-api-key-n8n",
            "ghcr.io/czlonkowski/n8n-mcp:latest"
          ]
        }
@@ -200,6 +223,7 @@ Per chi preferisce maggiore controllo e deployment locale:
 3. **Riavvia Claude Code/Claude Desktop**
 
 **Note importanti per Docker:**
+
 - `MCP_MODE=stdio` è obbligatorio per la compatibilità
 - `DISABLE_CONSOLE_OUTPUT=true` previene errori di parsing JSON
 - Sostituisci `N8N_API_URL` con l'URL della tua istanza n8n Cloud
@@ -284,6 +308,7 @@ Questo installerà tutte e 7 le skills automaticamente.
 ### Verifica Installazione
 
 Dopo l'installazione, verifica che le skills siano attive:
+
 ```
 /skills list
 ```
@@ -299,6 +324,7 @@ Dovresti vedere tutte le 7 n8n skills elencate.
 Quando vuoi creare un workflow, descrivi chiaramente cosa vuoi ottenere:
 
 **Esempio di richiesta base:**
+
 ```
 Crea un workflow n8n che:
 - Riceve dati tramite webhook
@@ -307,6 +333,7 @@ Crea un workflow n8n che:
 ```
 
 **Esempio di richiesta avanzata:**
+
 ```
 Costruisci un workflow n8n per:
 - Trigger: ogni giorno alle 9:00
@@ -322,9 +349,11 @@ Costruisci un workflow n8n per:
 **IMPORTANTE:** Ogni volta che Claude crea un workflow, **DEVE SEMPRE** fornire ENTRAMBI:
 
 1. **Link diretto al workflow** (formato clickable):
+
    ```
    🔗 Workflow URL: https://fedemaso.app.n8n.cloud/workflow/[ID_WORKFLOW]
    ```
+
    - Questo link ti permette di aprire immediatamente il workflow nella tua istanza n8n Cloud
    - Puoi cliccare e iniziare subito a usare/modificare il workflow
 
@@ -337,6 +366,7 @@ Costruisci un workflow n8n per:
      "settings": {...}
    }
    ```
+
    - Salva questo JSON come backup
    - Utile per versionamento e import in altre istanze
 
@@ -358,6 +388,7 @@ Se vuoi importare manualmente un workflow dal JSON:
 ### 1. Descrivi i Requisiti in Modo Chiaro
 
 **Buono:**
+
 ```
 Crea un workflow che monitora una cartella Google Drive,
 e quando viene aggiunto un nuovo PDF, lo invia via email
@@ -365,6 +396,7 @@ all'indirizzo specificato nel nome del file (formato: email@example.com_document
 ```
 
 **Da evitare:**
+
 ```
 Voglio qualcosa con Drive e email
 ```
@@ -372,6 +404,7 @@ Voglio qualcosa con Drive e email
 ### 2. Specifica i Trigger
 
 Indica sempre come vuoi attivare il workflow:
+
 - **Webhook**: per integrazioni esterne o API
 - **Schedule**: per task ricorrenti (es: "ogni giorno alle 9:00")
 - **Manual**: per esecuzioni manuali
@@ -380,6 +413,7 @@ Indica sempre come vuoi attivare il workflow:
 ### 3. Definisci la Logica di Business
 
 Se ci sono condizioni o trasformazioni:
+
 ```
 - Se il valore è > 100, invia notifica urgente
 - Altrimenti, aggiungi a una lista di revisione
@@ -389,6 +423,7 @@ Se ci sono condizioni o trasformazioni:
 ### 4. Indica le Credenziali Necessarie
 
 Menziona quali servizi userai:
+
 ```
 Userò le mie credenziali per:
 - Slack (workspace "MioTeam")
@@ -399,6 +434,7 @@ Userò le mie credenziali per:
 ### 5. Per Workflow Complessi, Usa Step Incrementali
 
 Invece di chiedere tutto in una volta:
+
 ```
 Step 1: Crea un workflow base webhook → Slack
 Step 2: Aggiungi validazione dati
@@ -411,6 +447,7 @@ Step 4: Aggiungi logging su Google Sheets
 ## Esempi di Workflow Comuni
 
 ### Esempio 1: Webhook → Notifica Slack
+
 ```
 Crea un workflow che:
 - Trigger: Webhook
@@ -419,6 +456,7 @@ Crea un workflow che:
 ```
 
 ### Esempio 2: Schedule → Report Email
+
 ```
 Crea un workflow che:
 - Trigger: Schedule (ogni lunedì alle 9:00)
@@ -428,6 +466,7 @@ Crea un workflow che:
 ```
 
 ### Esempio 3: Monitor → Azione Condizionale
+
 ```
 Crea un workflow che:
 - Trigger: Polling Gmail ogni 5 minuti
@@ -439,6 +478,7 @@ Crea un workflow che:
 ```
 
 ### Esempio 4: Data Transformation
+
 ```
 Crea un workflow che:
 - Trigger: Webhook
@@ -459,6 +499,7 @@ Crea un workflow che:
 **Sintomo:** Claude non riesce a cercare nodi o accedere alla documentazione n8n
 
 **Soluzioni:**
+
 1. Verifica che il file di configurazione MCP sia corretto
 2. Controlla che Claude Code sia stato riavviato dopo le modifiche
 3. Se usi Docker, verifica che il container sia in esecuzione:
@@ -473,6 +514,7 @@ Crea un workflow che:
 **Sintomo:** Claude non sembra usare le conoscenze n8n
 
 **Soluzioni:**
+
 1. Verifica installazione: `/skills list`
 2. Reinstalla se necessario: `/plugin install czlonkowski/n8n-skills`
 3. Riavvia Claude Code
@@ -483,6 +525,7 @@ Crea un workflow che:
 **Sintomo:** Errore di autenticazione con n8n Cloud
 
 **Soluzioni:**
+
 1. Verifica che l'API key sia copiata correttamente (senza spazi)
 2. Controlla che l'API key non sia scaduta
 3. Genera una nuova API key da n8n Cloud
@@ -493,6 +536,7 @@ Crea un workflow che:
 **Sintomo:** Il link al workflow genera errore 404
 
 **Soluzioni:**
+
 1. Verifica di essere loggato su n8n Cloud
 2. Controlla che il workflow esista nella tua istanza
 3. Usa il JSON export per importare manualmente il workflow
@@ -502,6 +546,7 @@ Crea un workflow che:
 **Sintomo:** Il workflow ha errori quando lo apri
 
 **Soluzioni:**
+
 1. Chiedi a Claude di "validare e correggere il workflow"
 2. Verifica che tutte le credenziali necessarie siano configurate in n8n
 3. Controlla che i nodi usati siano disponibili nella tua versione di n8n Cloud
@@ -512,17 +557,20 @@ Crea un workflow che:
 ## Risorse Utili
 
 ### Documentazione Ufficiale
+
 - [n8n MCP Server - GitHub](https://github.com/czlonkowski/n8n-mcp)
 - [n8n Skills - GitHub](https://github.com/czlonkowski/n8n-skills)
 - [n8n Cloud Documentation](https://docs.n8n.io/hosting/cloud/)
 - [n8n Node Reference](https://docs.n8n.io/integrations/)
 
 ### Dashboard e Tools
+
 - [n8n MCP Hosted Service](https://dashboard.n8n-mcp.com)
 - [n8n Cloud Console](https://app.n8n.cloud)
 - [n8n Community Forum](https://community.n8n.io)
 
 ### Template e Esempi
+
 - [n8n Workflow Templates](https://n8n.io/workflows)
 - Oltre 2,653 template disponibili tramite MCP server
 
@@ -550,17 +598,20 @@ Il server MCP n8n include telemetria opzionale. Per disabilitarla:
 ### Limitazioni Free Tier
 
 **Hosted Service:**
+
 - 100 chiamate MCP al giorno
 - Accesso completo a tutti i nodi
 - Nessuna scadenza
 
 **n8n Cloud Free:**
+
 - Limiti variabili (consulta la documentazione n8n)
 - Workflow execution limits
 
 ### Supporto
 
 Per problemi o domande:
+
 - Issues n8n-mcp: https://github.com/czlonkowski/n8n-mcp/issues
 - Issues n8n-skills: https://github.com/czlonkowski/n8n-skills/issues
 - n8n Community: https://community.n8n.io
@@ -579,3 +630,5 @@ un messaggio "Hello World" su Slack nel canale #general
 Claude utilizzerà automaticamente le skills e il server MCP per costruire un workflow completo, validato e pronto all'uso!
 
 **Ricorda:** Riceverai SEMPRE sia il link diretto che il JSON del workflow. Se Claude non fornisce entrambi, richiedi esplicitamente: _"Fornisci il link al workflow e il JSON export"_.
+
+test
