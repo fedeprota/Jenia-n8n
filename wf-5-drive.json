@@ -9,30 +9,64 @@
       "position": [0, 0]
     },
     {
-      "parameters": { "dataType": "string", "value1": "={{ $json.body.action }}", "rules": { "rules": [{ "value2": "list", "output": 0 }, { "value2": "upload", "output": 1 }] } },
-      "name": "Switch",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3,
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.action }}",
+              "value2": "list"
+            }
+          ]
+        }
+      },
+      "name": "IF List",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
       "position": [200, 0]
     },
     {
-      "parameters": { "operation": "list", "limit": 50 },
+      "parameters": {
+        "operation": "fileFolder",
+        "limit": 50,
+        "options": {}
+      },
       "name": "GDrive List",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [400, -100]
+      "position": [400, -100],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0aVD5X6UwNIkHAJh",
+          "name": "Google Drive account"
+        }
+      }
     },
     {
-      "parameters": { "operation": "upload", "fileContent": "={{ $json.body.content }}", "fileName": "={{ $json.body.filename }}" },
+      "parameters": {
+        "name": "={{ $json.body.filename }}",
+        "folderId": "root",
+        "options": {}
+      },
       "name": "GDrive Upload",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [400, 100]
+      "position": [400, 100],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "0aVD5X6UwNIkHAJh",
+          "name": "Google Drive account"
+        }
+      }
     }
   ],
   "connections": {
-    "Webhook": { "main": [[{ "node": "Switch", "type": "main", "index": 0 }]] },
-    "Switch": { "main": [[{ "node": "GDrive List", "type": "main", "index": 0 }], [{ "node": "GDrive Upload", "type": "main", "index": 0 }]] }
+    "Webhook": { "main": [[{ "node": "IF List", "type": "main", "index": 0 }]] },
+    "IF List": {
+      "main": [
+        [{ "node": "GDrive List", "type": "main", "index": 0 }],
+        [{ "node": "GDrive Upload", "type": "main", "index": 0 }]
+      ]
+    }
   },
   "settings": {}
 }

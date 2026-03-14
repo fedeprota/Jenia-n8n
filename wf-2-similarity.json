@@ -11,8 +11,8 @@
     {
       "parameters": { 
         "promptType": "define", 
-        "text": "Analizza il testo: {{ $json.body.text }} e restituisci un JSON con lo score di similarità e il litigation risk.", 
-        "options": { "systemMessage": "Sei un analista brevettuale. Ritorna ESATTAMENTE e SOLO sintassi JSON." } 
+        "text": "Analizza il seguente testo di un documento tecnico/brevettuale. Restituisci SOLO un JSON valido con: score (0-100), matchedPatents (numero), litigationRisk (oggetto con overallLevel HIGH/MEDIUM/LOW, highRiskCount, mediumRiskCount, lowRiskCount, recommendation), whiteSpaceAreas (array di label+coverage), bypassStrategies (array di stringhe), claimsPrediction (total, vulnerable, safe, uncertain), timeToObsolete (stringa). Testo: {{ $json.body.text }}", 
+        "options": { "systemMessage": "Sei un analista brevettuale esperto. Rispondi SOLO con JSON valido, senza markdown o commenti." } 
       },
       "name": "LLM Chain",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
@@ -20,24 +20,22 @@
       "position": [250, 0]
     },
     {
-      "parameters": { "model": "gpt-4o" },
+      "parameters": { "model": "gpt-4o", "options": {} },
       "name": "OpenAI Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
-      "position": [250, 200]
-    },
-    {
-      "parameters": { "options": {} },
-      "name": "Parse JSON",
-      "type": "n8n-nodes-base.jsonParse",
-      "typeVersion": 1,
-      "position": [500, 0]
+      "position": [250, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "T4mvEgIcxqkWo2x3",
+          "name": "OpenAi account 3"
+        }
+      }
     }
   ],
   "connections": {
     "Webhook": { "main": [[{ "node": "LLM Chain", "type": "main", "index": 0 }]] },
-    "OpenAI Model": { "ai_languageModel": [[{ "node": "LLM Chain", "type": "ai_languageModel", "index": 0 }]] },
-    "LLM Chain": { "main": [[{ "node": "Parse JSON", "type": "main", "index": 0 }]] }
+    "OpenAI Model": { "ai_languageModel": [[{ "node": "LLM Chain", "type": "ai_languageModel", "index": 0 }]] }
   },
   "settings": {}
 }

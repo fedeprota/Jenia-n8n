@@ -2,60 +2,62 @@
   "name": "3. Jenia - Patent Alert Cron",
   "nodes": [
     {
-      "parameters": { "rule": { "type": "cron", "value": "0 8 * * *" } },
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 12 }]
+        }
+      },
       "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1,
+      "typeVersion": 1.2,
       "position": [0, 0]
     },
     {
-      "parameters": { "url": "https://api.patentsview.org/patents/query", "method": "GET", "sendQuery": true, "queryParameters": { "parameters": [{ "name": "q", "value": "{\"_gte\":{\"patent_date\":\"2026-01-01\"}}" }] } },
-      "name": "HTTP Request",
+      "parameters": {
+        "url": "https://psxttovzzwfamdwwjndx.supabase.co/rest/v1/keywords?select=keyword",
+        "method": "GET",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeHR0b3Z6endmYW1kd3dqbmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODUyOTksImV4cCI6MjA4OTA2MTI5OX0.3MIB5wJf7Liavtb5jsaGtfivehu0rnJNkO1tH5YfUf4" },
+            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeHR0b3Z6endmYW1kd3dqbmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODUyOTksImV4cCI6MjA4OTA2MTI5OX0.3MIB5wJf7Liavtb5jsaGtfivehu0rnJNkO1tH5YfUf4" }
+          ]
+        }
+      },
+      "name": "Fetch Keywords",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
+      "typeVersion": 4.2,
       "position": [200, 0]
     },
     {
-      "parameters": { "promptType": "define", "text": "Summarize the patent and give a risk level: {{ $json.patent_title }}", "options": {} },
+      "parameters": {
+        "promptType": "define",
+        "text": "Based on these research keywords: {{ JSON.stringify($json) }}, generate a brief patent monitoring report. List any hypothetical recent patents that could be relevant, with title, company, risk_level (HIGH/MEDIUM/LOW), and a one-line summary. Return valid JSON array.",
+        "options": { "systemMessage": "You are a patent intelligence analyst. Return only valid JSON." }
+      },
       "name": "AI Summary",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1,
       "position": [400, 0]
     },
     {
-      "parameters": { "model": "gpt-4o-mini" },
+      "parameters": { "model": "gpt-4o-mini", "options": {} },
       "name": "OpenAI Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
-      "position": [400, 200]
-    },
-    {
-      "parameters": { 
-        "method": "POST", 
-        "url": "https://psxttovzzwfamdwwjndx.supabase.co/rest/v1/patents", 
-        "sendHeaders": true, 
-        "headerParameters": { 
-          "parameters": [
-            { "name": "apikey", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeHR0b3Z6endmYW1kd3dqbmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODUyOTksImV4cCI6MjA4OTA2MTI5OX0.3MIB5wJf7Liavtb5jsaGtfivehu0rnJNkO1tH5YfUf4" }, 
-            { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeHR0b3Z6endmYW1kd3dqbmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0ODUyOTksImV4cCI6MjA4OTA2MTI5OX0.3MIB5wJf7Liavtb5jsaGtfivehu0rnJNkO1tH5YfUf4" }, 
-            { "name": "Content-Type", "value": "application/json" }
-          ] 
-        }, 
-        "sendBody": true, 
-        "specifyBody": "json", 
-        "jsonBody": "={ \"title\": \"{{ $json.title }}\", \"company\": \"{{ $json.company }}\", \"summary\": \"{{ $json.summary }}\", \"risk_level\": \"MEDIUM\", \"similarity_pct\": 50 }" 
-      },
-      "name": "Supabase Upsert",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
-      "position": [600, 0]
+      "position": [400, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "T4mvEgIcxqkWo2x3",
+          "name": "OpenAi account 3"
+        }
+      }
     }
   ],
   "connections": {
-    "Schedule Trigger": { "main": [[{ "node": "HTTP Request", "type": "main", "index": 0 }]] },
-    "HTTP Request": { "main": [[{ "node": "AI Summary", "type": "main", "index": 0 }]] },
-    "OpenAI Model": { "ai_languageModel": [[{ "node": "AI Summary", "type": "ai_languageModel", "index": 0 }]] },
-    "AI Summary": { "main": [[{ "node": "Supabase Upsert", "type": "main", "index": 0 }]] }
+    "Schedule Trigger": { "main": [[{ "node": "Fetch Keywords", "type": "main", "index": 0 }]] },
+    "Fetch Keywords": { "main": [[{ "node": "AI Summary", "type": "main", "index": 0 }]] },
+    "OpenAI Model": { "ai_languageModel": [[{ "node": "AI Summary", "type": "ai_languageModel", "index": 0 }]] }
   },
   "settings": {}
 }

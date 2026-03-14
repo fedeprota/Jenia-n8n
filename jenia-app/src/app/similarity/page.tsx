@@ -88,29 +88,36 @@ export default function SimilarityPage() {
 
   const handleUpload = async (file: File) => {
     setIsUploading(true);
+    setAnalysisResult(null);
 
     try {
-      // In production: send to n8n webhook
       const formData = new FormData();
       formData.append('file', file);
+      
+      // Estraiamo il testo dal file per passarlo al webhook
+      // Per una vera app in produzione, il webhook gestirebbe direttamente il file binario, 
+      // ma dato che stiamo inviando { text: ... } al prompt di Langchain nel wf n8n,
+      // estraiamo il testo qui in modo semplificato o simuliamolo per il webhook se è un PDF complesso.
+      const text = await file.text().catch(() => "Testo estratto dal documento tecnico pdf...");
+      formData.append('text', text);
 
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL}/similarity-score`,
-          { method: 'POST', body: formData }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setAnalysisResult(data);
-          return;
-        }
-      } catch {
-        // n8n not available — fall back to mock
-      }
-
-      // Fallback: simulate analysis with mock data
-      await new Promise((r) => setTimeout(r, 2500));
-      setAnalysisResult(mockResult);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL}/similarity-score`,
+        { method: 'POST', body: formData }
+      );
+      
+      if (!res.ok) throw new Error('Errore nella connessione con n8n');
+      
+      const data = await res.json();
+      
+      // Il webhook restituisce l'output del LLM. Dato che il wf di n8n restituisce un JSON, 
+      // assicuriamoci di parsarlo correttamente (potrebbe essere annidato o restituito come stringa)
+      const parsedData = typeof data.output === 'string' ? JSON.parse(data.output) : (data.output || data);
+      
+      setAnalysisResult(parsedData as SimilarityResult);
+    } catch (error) {
+      console.error('Failed to get similarity score:', error);
+      alert('Impossibile ottenere il Similarity Score. Assicurati che il workflow n8n sia attivo.');
     } finally {
       setIsUploading(false);
     }
