@@ -1,0 +1,15 @@
+{
+    "mcpServers": {
+        "n8n-mcp": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "supergateway",
+                "--streamableHttp",
+                "https://fedemaso.app.n8n.cloud/mcp-server/http",
+                "--header",
+                "authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlZjFmNzYyNC1mMWM4LTRiN2ItYTE4OS02YTQ3OGQ0MDUyOWIiLCJpc3MiOiJuOG4iLCJhdWQiOiJtY3Atc2VydmVyLWFwaSIsImp0aSI6IjdhODBkMmUzLTQwYTMtNDQxNi05OGQ2LTQ5ZTZjN2JiNWFjYiIsImlhdCI6MTc3MzQ3ODgxMX0.FSUhdOc5P8IZMbRyCrV-_3X73NNqjSpuIxsRzuq9vXY"
+            ]
+        }
+    }
+}
