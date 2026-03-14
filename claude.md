@@ -631,4 +631,4 @@ Claude utilizzerà automaticamente le skills e il server MCP per costruire un wo
 
 **Ricorda:** Riceverai SEMPRE sia il link diretto che il JSON del workflow. Se Claude non fornisce entrambi, richiedi esplicitamente: _"Fornisci il link al workflow e il JSON export"_.
 
-test
+
