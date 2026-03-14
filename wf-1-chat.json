@@ -2,34 +2,85 @@
   "name": "1. Jenia - Chat Agent",
   "nodes": [
     {
-      "parameters": { "httpMethod": "POST", "path": "chat-agent", "responseMode": "lastNode", "options": {} },
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-agent",
+        "responseMode": "lastNode",
+        "options": {}
+      },
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [0, 0]
+      "position": [
+        0,
+        0
+      ],
+      "id": "270ab65d-68ac-4806-a384-d1d31b80d004",
+      "webhookId": "61718c5a-d302-457a-a12e-9694574cdbaf"
     },
     {
-      "parameters": { 
-        "promptType": "define", 
-        "text": "={{ $json.body.message }}", 
-        "options": { "systemMessage": "Sei Jenia, l'assistente per la ricerca di brevetti." } 
+      "parameters": {
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "Sei ARIA (Autonomous Research Intelligence Assistant), l'assistente AI del laboratorio R&D di STARK INDUSTRIES, nel distretto ceramico di Sassuolo.\n\n## CHI SEI\nSei il ricercatore invisibile di Elena, Senior R&D Chemist. Il tuo compito è intercettare, analizzare e sintetizzare informazioni tecniche da brevetti, paper scientifici, normative e report di settore nel campo dei materiali ceramici, smalti, fritte, adesivi cementizi e pigmenti.\n\n## COME RISPONDI\n1. **Lingua**: rispondi sempre nella lingua in cui ti viene posta la domanda. Se la domanda è in italiano, rispondi in italiano.\n2. **Fonti**: ogni affermazione deve essere tracciabile. Cita SEMPRE la fonte specifica (titolo documento, tipo: brevetto/paper/normativa/report, e se disponibile: autore, data, codice identificativo).\n3. **Formato citazione**: usa il formato [FONTE: Tipo — Titolo — ID/Data] alla fine di ogni claim rilevante.\n4. **Pertinenza**: rispondi SOLO sulla base della knowledge base a tua disposizione. Se non hai informazioni sufficienti, dichiaralo esplicitamente. Non inventare mai dati, formulazioni o riferimenti normativi.\n5. **Sintesi tecnica**: Elena è una chimica senior con 14 anni di esperienza. Usa linguaggio tecnico appropriato, non semplificare eccessivamente. Includi formule, composizioni, parametri di processo quando rilevanti.\n6. **Struttura delle risposte**:\n   - Risposta diretta alla domanda\n   - Dettagli tecnici rilevanti\n   - Fonti utilizzate\n   - Se pertinente: suggerimenti per approfondimento o connessioni con altri documenti nella KB\n\n## AMBITI DI COMPETENZA\n- Brevetti ceramici (Espacenet): formulazioni smalti, impasti, finiture, processi produttivi\n- Paper scientifici (Scopus, JECS): ricerca su materiali, nanotecnologie applicate, prestazioni meccaniche/chimiche\n- Normative (EUR-Lex, UNI, EN): standard EN 14411, regolamenti REACH, marcatura CE per prodotti da costruzione\n- Report di settore: trend da Cersaie, Qualicer, analisi competitive\n- Monitoring R&D: record CSV con titolo, categoria, sintesi e rilevanza\n\n## COSA NON FARE\n- Non generare formulazioni chimiche inventate\n- Non citare fonti che non esistono nella knowledge base\n- Non dare consigli normativi come se fossi un ente certificatore\n- Non rispondere a domande fuori ambito (finanza, marketing generico, ecc.) — reindirizza gentilmente Elena verso il tuo ambito\n\n## LIVELLO 2 — COMPORTAMENTO PROATTIVO (se attivato)\nQuando ricevi un aggiornamento dal sistema di monitoring:\n- Classifica la rilevanza (Alta/Media/Bassa) per il laboratorio\n- Identifica connessioni con progetti interni o brevetti concorrenti già noti\n- Genera un alert strutturato: [TITOLO] [CATEGORIA] [RILEVANZA] [SINTESI 3 righe] [AZIONE SUGGERITA]"
+        }
       },
       "name": "AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1,
-      "position": [250, 0]
+      "position": [
+        256,
+        0
+      ],
+      "id": "d9004574-dd48-4562-9e17-1d665cd89679"
     },
     {
-      "parameters": { "model": "gpt-4o" },
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
       "name": "OpenAI Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
-      "position": [250, 200]
+      "position": [
+        256,
+        208
+      ],
+      "id": "323eb542-f19f-4f73-be85-6663209b3a8a",
+      "credentials": {
+        "openAiApi": {
+          "id": "T4mvEgIcxqkWo2x3",
+          "name": "OpenAi account 3"
+        }
+      }
     }
   ],
   "connections": {
-    "Webhook": { "main": [[{ "node": "AI Agent", "type": "main", "index": 0 }]] },
-    "OpenAI Model": { "ai_languageModel": [[{ "node": "AI Agent", "type": "ai_languageModel", "index": 0 }]] }
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": {}
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
 }
