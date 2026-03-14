@@ -18,39 +18,6 @@ Non lasciare mai modifiche non committate o non pushate al termine di un prompt.
 
 ---
 
-## Gestione della Memoria (OBBLIGATORIO)
-
-**REGOLA CRITICA:** La memoria è persistente tra le sessioni e va **COSTANTEMENTE AGGIORNATA** ad ogni interazione.
-
-### File Memoria
-- **Percorso:** `C:\Users\prota\.claude\projects\c--Users-prota-OneDrive-Desktop-Vibe-coding-Hackaton-Jenia-n8n\memory\MEMORY.md`
-- **Contenuto:** Knowledge acquisita dalle conversazioni, findings, pattern, preferenze utente
-
-### Quando Aggiornare
-✅ **OGNI VOLTA CHE UNA MODIFICA VIENE VERIFICATA E FUNZIONA**, aggiornare MEMORY.md con la knowledge acquisita. Non aspettare la fine della sessione.
-
-✅ **AL TERMINE di OGNI interazione**, verificare se c'è nuova knowledge:
-1. **Learning & Patterns:** Nuovi insight su n8n, workflow, best practices acquisiti
-2. **Findings:** Soluzioni a problemi, workaround, tecniche provate
-3. **Workflow Creati:** Traccia di workflow importanti con link e note
-4. **Issues & Solutions:** Problemi incontrati e come risolti
-5. **User Preferences:** Preferenze di lavoro, stile comunicativo
-
-### Come Aggiornare
-```bash
-# Usa Edit per aggiungere nuova knowledge al MEMORY.md
-# Sezioni da aggiornare:
-# - "Key Learnings & Patterns"
-# - "Workflow Creati"
-# - "Common Issues & Solutions"
-# - "Tools & Skills Status"
-```
-
-### Consulta la Memoria
-**ALL'INIZIO di OGNI sessione**, leggi il MEMORY.md per allinearsi con il contesto precedente.
-
----
-
 ## Credenziali e API (AUTO-LOADED)
 
 **IMPORTANTE: Queste credenziali sono disponibili in ogni sessione Claude Code. NON chiedere le credenziali all'utente.**
